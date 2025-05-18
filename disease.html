@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AgriMind - Disease Detector</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- TensorFlow.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.3.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+
+  <style>
+    :root {
+      --beige: #f5f1e3;
+      --green: #74b49b;
+      --dark-green: #517664;
+      --text-dark: #333;
+      --accent: #ff914d;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: var(--beige);
+      color: var(--text-dark);
+    }
+
+    header {
+      background-color: var(--green);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav a {
+      color: white;
+      margin-left: 1.5rem;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    #language-select {
+      margin-left: 1.5rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 5px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .container {
+      background: white;
+      max-width: 700px;
+      margin: 3rem auto;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      color: var(--dark-green);
+      margin-bottom: 1rem;
+    }
+
+    input[type="file"] {
+      margin-top: 1rem;
+      padding: 0.6rem;
+      width: 100%;
+    }
+
+    #uploaded-image {
+      margin-top: 1.5rem;
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 12px;
+      display: none;
+    }
+
+    button {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 1.2rem;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #ff7a26;
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    #result-card {
+      display: none;
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background-color: #eef5e9;
+      border-radius: 12px;
+      border: 1px solid #cde0c1;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      text-align: left;
+      color: var(--dark-green);
+    }
+
+    #result-card h2 {
+      margin-top: 0;
+      color: var(--dark-green);
+    }
+
+    .cure-toggle {
+      cursor: pointer;
+      color: #388e3c;
+      font-weight: bold;
+      margin-top: 1rem;
+      user-select: none;
+    }
+
+    .cure-content {
+      display: none;
+      margin-top: 0.5rem;
+      padding-left: 1rem;
+      border-left: 2px solid var(--dark-green);
+      color: #4a6741;
+    }
+
+    .footer {
+      margin-top: 4rem;
+      padding: 1rem;
+      text-align: center;
+      background-color: var(--dark-green);
+      color: white;
+    }
+
+    .loading {
+      display: none;
+      margin: 1rem auto;
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #74b49b;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h2>AgriMind</h2>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="disease.html">Detect Disease</a>
+      <a href="weather.html">Weather</a>
+      <a href="fertilizer.html">Fertilizer</a>
+      <a href="community.html">Community</a>
+      <a href="login.html">Login</a>
+
+      <!-- Language Selector -->
+      <select id="language-select" aria-label="Select Language">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+        <option value="pa">ਪੰਜਾਬੀ</option>
+      </select>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1 id="main-title">🌾 Detect Plant Disease</h1>
+    <p id="main-description">Select a leaf image to identify possible plant diseases using AI.</p>
+    
+    <input type="file" id="upload" accept="image/*" onchange="previewImage()" aria-label="Upload leaf image" />
+    <img id="uploaded-image" alt="Uploaded plant leaf image" />
+    <div class="loading" id="loading-spinner"></div>
+    <button id="detect-btn" onclick="predict()" disabled>🔍 Detect Disease</button>
+
+    <div id="result-card" role="region" aria-live="polite">
+      <h2 id="result-title">🌿 Result</h2>
+      <p id="predicted-disease"></p>
+      <div class="cure-toggle" id="toggle-cure-btn" onclick="toggleCure()">Show Cure +</div>
+      <div class="cure-content" id="cure-info"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    &copy; 2025 AgriMind. All rights reserved.
+  </footer>
+
+  <script>
+    // Model URL - Make sure this is correct
+    const MODEL_URL = "https://teachablemachine.withgoogle.com/models/fOVBgFXss/";
+
+    // Translation dictionary
+    const translations = {
+      en: {
+        mainTitle: "🌾 Detect Plant Disease",
+        mainDescription: "Select a leaf image to identify possible plant diseases using AI.",
+        detectBtn: "🔍 Detect Disease",
+        resultTitle: "🌿 Result",
+        showCure: "Show Cure +",
+        hideCure: "Hide Cure -",
+        loading: "Analyzing...",
+        diseaseCures: {
+          "Rice Blast": "Use fungicides like tricyclazole. Maintain proper spacing and avoid excessive nitrogen fertilizers.",
+          "Rice Brown Spot": "Apply potash and zinc. Avoid continuous flooding. Use resistant varieties.",
+          "Rice bacterial leaf blight": "Use fungicides containing mancozeb or copper. Remove infected plants.",
+          "Wheat Healthy": "Your plant appears healthy! Keep up good irrigation and nutrient practices.",
+          "Wheat Septoria": "Spray Propiconazole (0.1%) at early stage. Avoid overhead irrigation and allow airflow.",
+          "Tungro": "Control green leafhopper using insecticides. Use resistant varieties. Destroy infected plants.",
+          "Cure not available": "Cure information not available."
+        }
+      },
+      hi: {
+        mainTitle: "🌾 पौधे की बीमारी का पता लगाएं",
+        mainDescription: "AI का उपयोग करके संभावित पौधे की बीमारियों की पहचान के लिए एक पत्ती की छवि चुनें।",
+        detectBtn: "🔍 बीमारी पहचानें",
+        resultTitle: "🌿 परिणाम",
+        showCure: "इलाज दिखाएं +",
+        hideCure: "इलाज छिपाएं -",
+        loading: "विश्लेषण किया जा रहा है...",
+        diseaseCures: {
+          "Rice Blast": "ट्राइसाइक्लाजोल जैसे फंगीसाइड का उपयोग करें। उचित दूरी बनाए रखें और अधिक नाइट्रोजन उर्वरकों से बचें।",
+          "Rice Brown Spot": "पोटाश और जिंक लगाएं। लगातार जलजमाव से बचें। प्रतिरोधी किस्मों का उपयोग करें।",
+          "Rice bacterial leaf blight": "मैनकोज़ेब या कॉपर युक्त फंगीसाइड का उपयोग करें। संक्रमित पौधों को हटाएं।",
+          "Wheat Healthy": "आपका पौधा स्वस्थ लगता है! अच्छी सिंचाई और पोषक तत्व प्रथाओं को बनाए रखें।",
+          "Wheat Septoria": "प्रारंभिक चरण में प्रोपिकोनाजोल (0.1%) छिड़काव करें। ऊपर से सिंचाई से बचें और हवा का प्रवाह सुनिश्चित करें।",
+          "Tungro": "हरा लीफहॉपर नियंत्रण के लिए कीटनाशकों का उपयोग करें। प्रतिरोधी किस्मों का उपयोग करें। संक्रमित पौधों को नष्ट करें।",
+          "Cure not available": "इलाज की जानकारी उपलब्ध नहीं है।"
+        }
+      },
+      pa: {
+        mainTitle: "🌾 ਪੌਦੇ ਦੀ ਬਿਮਾਰੀ ਦਾ ਪਤਾ ਲਗਾਓ",
+        mainDescription: "AI ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਸੰਭਾਵਿਤ ਪੌਦੇ ਦੀਆਂ ਬਿਮਾਰੀਆਂ ਦੀ ਪਛਾਣ ਲਈ ਪੱਤੇ ਦੀ ਤਸਵੀਰ ਚੁਣੋ।",
+        detectBtn: "🔍 ਬਿਮਾਰੀ ਪਛਾਣੋ",
+        resultTitle: "🌿 ਨਤੀਜਾ",
+        showCure: "इलाज ਵੇਖਾਓ +",
+        hideCure: "इਲाज ਛੁਪਾਓ -",
+        loading: "ਵਿਸ਼ਲੇਸ਼ਣ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+        diseaseCures: {
+          "Rice Blast": "ਟ੍ਰਾਈਸਾਈਕਲਾਜੋਲ ਵਰਗੇ ਫੰਗਿਸਾਈਡ ਦੀ ਵਰਤੋਂ ਕਰੋ। ਠੀਕ ਦੂਰੀ ਬਣਾਓ ਅਤੇ ਜਿਆਦਾ ਨਾਈਟ੍ਰੋਜਨ ਵਾਲੇ ਖਾਦ ਤੋਂ ਬਚੋ।",
+          "Rice Brown Spot": "ਪੋਟਾਸ਼ ਅਤੇ ਜ਼ਿੰਕ ਲਗਾਓ। ਲਗਾਤਾਰ ਬੁੱਝਣ ਤੋਂ ਬਚੋ। ਪ੍ਰਤਿਰੋਧਕ ਕਿਸਮਾਂ ਦੀ ਵਰਤੋਂ ਕਰੋ।",
+          "Rice bacterial leaf blight": "ਮੈਂਕੋਜ਼ੇਬ ਜਾਂ ਤਾਮੇ ਵਾਲੇ ਫੰਗਿਸਾਈਡ ਦੀ ਵਰਤੋਂ ਕਰੋ। ਸੰਕ੍ਰਮਿਤ ਪੌਦਿਆਂ ਨੂੰ ਹਟਾਓ।",
+          "Wheat Healthy": "ਤੁਹਾਡੇ ਪੌਦੇ ਸਿਹਤਮੰਦ ਲੱਗਦੇ ਹਨ! ਵਧੀਆ ਸਿੰਚਾਈ ਅਤੇ ਪੋਸ਼ਣ ਦੀਆਂ ਪ੍ਰਥਾਵਾਂ ਜਾਰੀ ਰੱਖੋ।",
+          "Wheat Septoria": "ਸ਼ੁਰੂਆਤੀ ਪੜਾਅ 'ਤੇ ਪ੍ਰੋਪਿਕੋਨਾਜ਼ੋਲ (0.1%) ਛਿੜਕਾਓ। ਊਪਰੋਂ ਸਿੰਚਾਈ ਤੋਂ ਬਚੋ ਅਤੇ ਹਵਾ ਦਾ ਪ੍ਰਵਾਹ ਯਕੀਨੀ ਬਣਾਓ।",
+          "Tungro": "ਹਰੇ ਲੀਫਹੌਪਰ ਨੂੰ ਕੀਟਨਾਸ਼ਕ ਨਾਲ ਕੰਟਰੋਲ ਕਰੋ। ਪ੍ਰਤਿਰੋਧਕ ਕਿਸਮਾਂ ਦੀ ਵਰਤੋਂ ਕਰੋ। ਸੰਕ੍ਰਮਿਤ ਪੌਦਿਆਂ ਨੂੰ ਨਸ਼ਟ ਕਰੋ।",
+          "Cure not available": "ਇਲਾਜ ਦੀ ਜਾਣਕਾਰੀ ਉਪਲਬਧ ਨਹੀਂ ਹੈ।"
+        }
+      }
+    };
+
+    let model, maxPredictions;
+    let currentLang = 'en';
+
+    async function loadModel() {
+      try {
+        const modelURL = MODEL_URL + "model.json";
+        const metadataURL = MODEL_URL + "metadata.json";
+
+        // Show loading state
+        document.getElementById("loading-spinner").style.display = 'block';
+        
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        // Enable detect button after model loads
+        document.getElementById("detect-btn").disabled = false;
+        document.getElementById("loading-spinner").style.display = 'none';
+        
+        console.log("Model loaded successfully");
+      } catch (error) {
+        console.error("Error loading model:", error);
+        alert("Failed to load the AI model. Please try again later.");
+        document.getElementById("loading-spinner").style.display = 'none';
+      }
+    }
+
+    function previewImage() {
+      const input = document.getElementById('upload');
+      const image = document.getElementById('uploaded-image');
+      const resultCard = document.getElementById('result-card');
+
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        // Check file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          alert("Image size should be less than 5MB");
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          image.src = e.target.result;
+          image.style.display = 'block';
+          resultCard.style.display = 'none';
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function predict() {
+      const image = document.getElementById('uploaded-image');
+      const resultCard = document.getElementById('result-card');
+      const predictedDisease = document.getElementById('predicted-disease');
+      const cureInfo = document.getElementById('cure-info');
+      const toggleCureBtn = document.getElementById('toggle-cure-btn');
+      const detectBtn = document.getElementById('detect-btn');
+      const loadingSpinner = document.getElementById('loading-spinner');
+
+      if (!image.src || image.style.display === 'none') {
+        alert(translations[currentLang].uploadAlert || "Please upload an image first!");
+        return;
+      }
+
+      try {
+        // Show loading state
+        detectBtn.disabled = true;
+        loadingSpinner.style.display = 'block';
+        detectBtn.textContent = translations[currentLang].loading || "Analyzing...";
+
+        // Predict
+        const predictions = await model.predict(image, false);
+
+        // Find highest prediction
+        let highestProb = 0;
+        let highestClass = "";
+        predictions.forEach(pred => {
+          if (pred.probability > highestProb) {
+            highestProb = pred.probability;
+            highestClass = pred.className;
+          }
+        });
+
+        predictedDisease.textContent = `${highestClass} (${(highestProb * 100).toFixed(2)}% confidence)`;
+
+        // Show cure info toggle and clear cure content
+        cureInfo.style.display = 'none';
+        cureInfo.textContent = "";
+        toggleCureBtn.textContent = translations[currentLang].showCure;
+
+        // Show result card
+        resultCard.style.display = 'block';
+      } catch (error) {
+        console.error("Prediction error:", error);
+        alert("An error occurred during analysis. Please try again.");
+      } finally {
+        // Reset button state
+        detectBtn.disabled = false;
+        loadingSpinner.style.display = 'none';
+        detectBtn.textContent = translations[currentLang].detectBtn;
+      }
+    }
+
+    function toggleCure() {
+      const cureInfo = document.getElementById('cure-info');
+      const toggleCureBtn = document.getElementById('toggle-cure-btn');
+      const diseaseText = document.getElementById('predicted-disease').textContent;
+      const predictedDisease = diseaseText.split(" (")[0];
+
+      if (cureInfo.style.display === 'block') {
+        cureInfo.style.display = 'none';
+        toggleCureBtn.textContent = translations[currentLang].showCure;
+      } else {
+        let cureText = translations[currentLang].diseaseCures[predictedDisease];
+        if (!cureText) cureText = translations[currentLang].diseaseCures["Cure not available"];
+        cureInfo.textContent = cureText;
+        cureInfo.style.display = 'block';
+        toggleCureBtn.textContent = translations[currentLang].hideCure;
+      }
+    }
+
+    // Language switcher
+    document.getElementById('language-select').addEventListener('change', (e) => {
+      currentLang = e.target.value;
+      updateLanguage();
+    });
+
+    function updateLanguage() {
+      const t = translations[currentLang];
+      document.getElementById('main-title').textContent = t.mainTitle;
+      document.getElementById('main-description').textContent = t.mainDescription;
+      document.getElementById('detect-btn').textContent = t.detectBtn;
+      document.getElementById('result-title').textContent = t.resultTitle;
+
+      const toggleCureBtn = document.getElementById('toggle-cure-btn');
+      const cureInfo = document.getElementById('cure-info');
+      const resultCard = document.getElementById('result-card');
+
+      // Update cure toggle text
+      if (cureInfo.style.display === 'block') {
+        toggleCureBtn.textContent = t.hideCure;
+        // Update cure text in case language changed while open
+        const diseaseText = document.getElementById('predicted-disease').textContent;
+        const predictedDisease = diseaseText.split(" (")[0];
+        let cureText = t.diseaseCures[predictedDisease];
+        if (!cureText) cureText = t.diseaseCures["Cure not available"];
+        cureInfo.textContent = cureText;
+      } else {
+        toggleCureBtn.textContent = t.showCure;
+      }
+    }
+
+    // Initialize
+    loadModel();
+  </script>
+</body>
+</html>

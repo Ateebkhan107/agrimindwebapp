@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriMind - Smart Farming Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --beige: #f5f1e3;
+      --green: #74b49b;
+      --dark-green: #517664;
+      --text-dark: #2b2b2b;
+      --accent: #ff914d;
+      --white: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: var(--beige);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: var(--green);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header h2 {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    nav a {
+      color: var(--white);
+      margin-left: 1.2rem;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      background: linear-gradient(to right, #f5f1e3, #e9f6f1);
+    }
+
+    .hero img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--dark-green);
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .hero-buttons {
+      margin-top: 2rem;
+    }
+
+    .hero-buttons button, .hero-buttons select {
+      background-color: var(--accent);
+      color: var(--white);
+      border: none;
+      padding: 0.8rem 1.5rem;
+      margin: 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+
+    .hero-buttons button:hover,
+    .hero-buttons select:hover {
+      background-color: #ff7a26;
+    }
+
+    .footer {
+      background-color: var(--dark-green);
+      color: var(--white);
+      text-align: center;
+      padding: 1rem;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+    }
+
+    @media (min-width: 768px) {
+      .hero {
+        flex-direction: row;
+        justify-content: space-around;
+        text-align: left;
+      }
+
+      .hero img {
+        width: 400px;
+        margin-bottom: 0;
+      }
+
+      .hero-content {
+        max-width: 600px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>AgriMind</h2>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="disease.html">Detect Disease</a>
+      <a href="weather.html">Weather</a>
+      <a href="fertilizer.html">Fertilizer</a>
+      <a href="community.html">Community</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </header>
+
+  <main class="hero">
+    <img src="farmer.jpg" alt="Farmer working in field">
+    <div class="hero-content">
+      <h1 id="main-heading">Empowering Farmers with Smart Agriculture</h1>
+      <p id="main-desc">AgriMind helps you detect plant diseases, predict weather, and get fertilizer suggestions—all in your language, with voice help and offline access. Built for every Indian farmer, with love and care.</p>
+      <div class="hero-buttons">
+        <select id="language-selector" onchange="changeLanguage()">
+          <option value="en">🌐 English</option>
+          <option value="hi">🇮🇳 हिंदी</option>
+          <option value="ta">🇮🇳 தமிழ்</option>
+          <option value="pa">🇮🇳 ਪੰਜਾਬੀ</option>
+        </select>
+        <button onclick="speakHelp()">🎤 Voice Help</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    &copy; 2025 AgriMind. All rights reserved.
+  </footer>
+
+  <script>
+    const translations = {
+      en: {
+        heading: "Empowering Farmers with Smart Agriculture",
+        desc: "AgriMind helps you detect plant diseases, predict weather, and get fertilizer suggestions—all in your language, with voice help and offline access. Built for every Indian farmer, with love and care.",
+        voice: "Welcome to AgriMind! Click on any feature above to get started."
+      },
+      hi: {
+        heading: "स्मार्ट कृषि से किसानों को सशक्त बनाना",
+        desc: "एग्रीमाइंड आपको पौधों की बीमारियाँ पहचानने, मौसम का पूर्वानुमान लगाने और उर्वरक सुझाव प्राप्त करने में मदद करता है—आपकी भाषा में, वॉयस हेल्प और ऑफलाइन एक्सेस के साथ। हर भारतीय किसान के लिए बनाया गया।",
+        voice: "एग्रीमाइंड में आपका स्वागत है! ऊपर किसी भी फ़ीचर पर क्लिक करके शुरू करें।"
+      },
+      ta: {
+        heading: "ச마트 வேளாண்மையுடன் விவசாயிகளை சக்திவாய்மையாக்குதல்",
+        desc: "AgriMind உங்கள் மொழியில் குரல் உதவியுடன் நோய்கள் கண்டறிதல், வானிலை கணிப்பு மற்றும் உர பரிந்துரைகளை வழங்குகிறது. ஒவ்வொரு இந்திய விவசாயிக்கும் விருப்பமாக உருவாக்கப்பட்டது.",
+        voice: "AgriMind இற்கு வரவேற்கிறோம்! எந்த அம்சத்தையும் கிளிக் செய்து தொடங்குங்கள்."
+      },
+      pa: {
+        heading: "ਸਮਾਰਟ ਖੇਤੀ ਨਾਲ ਕਿਸਾਨਾਂ ਨੂੰ ਸਸ਼ਕਤ ਬਣਾਉਣਾ",
+        desc: "ਐਗਰੀਮਾਈਂਡ ਤੁਹਾਨੂੰ ਰੋਗ ਪਛਾਣ, ਮੌਸਮ ਭਵਿੱਖਬਾਣੀ ਅਤੇ ਖਾਦ ਦੀ ਸਿਫਾਰਿਸ਼ਾਂ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ—ਤੁਹਾਡੀ ਭਾਸ਼ਾ ਵਿੱਚ, ਵੋਇਸ ਮਦਦ ਅਤੇ ਆਫਲਾਈਨ ਪਹੁੰਚ ਦੇ ਨਾਲ। ਹਰ ਭਾਰਤੀ ਕਿਸਾਨ ਲਈ ਬਣਾਇਆ ਗਿਆ।",
+        voice: "ਐਗਰੀਮਾਈਂਡ ਵਿੱਚ ਤੁਹਾਡਾ ਸੁਆਗਤ ਹੈ! ਕਿਸੇ ਵੀ ਫੀਚਰ ਤੇ ਕਲਿਕ ਕਰਕੇ ਸ਼ੁਰੂ ਕਰੋ।"
+      }
+    };
+
+    function changeLanguage() {
+      const lang = document.getElementById("language-selector").value;
+      const data = translations[lang];
+
+      document.getElementById("main-heading").innerText = data.heading;
+      document.getElementById("main-desc").innerText = data.desc;
+
+      localStorage.setItem("agrimind-lang", lang);
+    }
+
+    function speakHelp() {
+      const lang = localStorage.getItem("agrimind-lang") || "en";
+      const msg = new SpeechSynthesisUtterance(translations[lang].voice);
+      window.speechSynthesis.speak(msg);
+    }
+
+    window.onload = function () {
+      const savedLang = localStorage.getItem("agrimind-lang") || "en";
+      document.getElementById("language-selector").value = savedLang;
+      changeLanguage();
+    };
+  </script>
+</body>
+</html>

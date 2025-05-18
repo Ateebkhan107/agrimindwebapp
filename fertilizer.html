@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fertilizer Suggestion - AgriMind</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --beige: #f5f1e3;
+      --green: #74b49b;
+      --dark-green: #517664;
+      --text-dark: #333;
+      --accent: #ff914d;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--beige);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--green);
+      padding: 1rem 2rem;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav a {
+      margin-left: 1.5rem;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .container {
+      padding: 2rem;
+      flex: 1;
+      text-align: center;
+    }
+
+    select, input {
+      padding: 0.7rem;
+      width: 80%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin: 1rem 0;
+    }
+
+    button {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .result {
+      margin-top: 2rem;
+      background-color: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: var(--dark-green);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>AgriMind</h2>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="disease.html">Detect Disease</a>
+      <a href="weather.html">Weather</a>
+      <a href="fertilizer.html">Fertilizer</a>
+      <a href="community.html">Community</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1>Fertilizer Suggestions</h1>
+    <p>Select your crop and soil type to get the best fertilizer recommendation.</p>
+
+    <select id="crop">
+      <option value="">-- Select Crop --</option>
+      <option value="rice">Rice</option>
+      <option value="wheat">Wheat</option>
+      <option value="maize">Maize</option>
+      <option value="cotton">Cotton</option>
+      <option value="potato">Potato</option>
+    </select>
+
+    <select id="soil">
+      <option value="">-- Select Soil Type --</option>
+      <option value="loamy">Loamy</option>
+      <option value="sandy">Sandy</option>
+      <option value="clay">Clay</option>
+      <option value="silty">Silty</option>
+      <option value="peaty">Peaty</option>
+    </select>
+
+    <br />
+    <button onclick="suggestFertilizer()">Get Suggestion</button>
+
+    <div class="result" id="fertilizerResult">
+      <!-- Fertilizer suggestion will appear here -->
+    </div>
+  </main>
+
+  <footer class="footer">
+    &copy; 2025 AgriMind. All rights reserved.
+  </footer>
+
+  <script>
+    function suggestFertilizer() {
+      const crop = document.getElementById("crop").value;
+      const soil = document.getElementById("soil").value;
+      const resultDiv = document.getElementById("fertilizerResult");
+
+      if (!crop || !soil) {
+        alert("Please select both crop and soil type.");
+        return;
+      }
+
+      // Placeholder logic for demo
+      resultDiv.innerHTML = `<h3>Best Fertilizer for ${crop} on ${soil} soil</h3>
+        <p>Recommended: Urea + DAP (Diammonium Phosphate)</p>
+        <p>Use organic compost to improve soil fertility.</p>`;
+    }
+  </script>
+</body>
+</html>

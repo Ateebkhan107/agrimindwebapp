@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - AgriMind</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --beige: #f4f4f2;
+      --green: #2f5233;
+      --green-hover: #4f704b;
+      --dark: #1c1c1c;
+      --white: #ffffff;
+      --accent: #ff914d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--beige);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background-color: var(--green);
+      color: var(--white);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+    }
+
+    nav a {
+      color: var(--white);
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-weight: 500;
+      transition: opacity 0.3s ease;
+    }
+
+    nav a:hover {
+      opacity: 0.8;
+    }
+
+    /* Login Box */
+    .main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    .login-box {
+      background-color: var(--white);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+      font-size: 1.5rem;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 1rem;
+      background-color: #fefefe;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: var(--green-hover);
+    }
+
+    .social-login {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .social-login button {
+      background-color: var(--accent);
+      margin-top: 0.5rem;
+    }
+
+    .footer-link {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #444;
+    }
+
+    .footer-link a {
+      color: var(--green);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--green);
+      color: var(--white);
+      text-align: center;
+      padding: 1rem 2rem;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav {
+        margin-top: 0.5rem;
+      }
+
+      nav a {
+        margin-left: 0;
+        margin-right: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>AgriMind</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="disease.html">disease detection</a>
+      <a href="weather.html">weather</a>
+      <a href="fertilizer.html">fertilizer</a>
+      <a href="community.html">community</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="login-box">
+      <h2>Login to AgriMind</h2>
+      <form onsubmit="return loginUser(event)">
+        <input type="email" placeholder="Enter your email" required />
+        <input type="password" placeholder="Enter your password" required />
+        <button type="submit">Login</button>
+      </form>
+
+      <div class="social-login">
+        <p>Or login with</p>
+        <button onclick="alert('Google login coming soon!')">Google</button>
+        <button onclick="alert('Facebook login coming soon!')">Facebook</button>
+      </div>
+
+      <div class="footer-link">
+        <p>Don't have an account? <a href="#">Register here</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 AgriMind. All rights reserved.
+  </footer>
+
+  <script>
+    function loginUser(event) {
+      event.preventDefault();
+      alert("Login functionality will be added later.");
+      return false;
+    }
+  </script>
+
+</body>
+</html>

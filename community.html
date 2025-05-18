@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AgriMind - Community</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --beige: #f5f1e3;
+      --green: #74b49b;
+      --dark-green: #517664;
+      --text-dark: #2b2b2b;
+      --accent: #ff914d;
+      --white: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: var(--beige);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: var(--green);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header h2 {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    nav a {
+      color: var(--white);
+      margin-left: 1.2rem;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    h3 {
+      margin-top: 2rem;
+      font-size: 1.4rem;
+      color: var(--dark-green);
+    }
+
+    textarea {
+      width: 100%;
+      border-radius: 10px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      background-color: var(--accent);
+      color: var(--white);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+      margin-right: 10px;
+    }
+
+    button:hover {
+      background-color: #ff7a26;
+    }
+
+    .post {
+      background-color: #f9fdf7;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      border-left: 4px solid var(--green);
+    }
+
+    .reply-box input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .replies {
+      margin-top: 10px;
+      padding-left: 15px;
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    .replies p {
+      margin: 4px 0;
+      padding-left: 10px;
+      border-left: 2px solid #c5dec5;
+    }
+
+    .footer {
+      background-color: var(--dark-green);
+      color: var(--white);
+      text-align: center;
+      padding: 1rem;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+    }
+
+    .buttons {
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h2>AgriMind</h2>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="disease.html">Detect Disease</a>
+      <a href="weather.html">Weather</a>
+      <a href="fertilizer.html">Fertilizer</a>
+      <a href="community.html">Community</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h3>Share your thoughts 🌱</h3>
+    <textarea id="new-post" placeholder="What's on your mind?" rows="3"></textarea>
+    <div class="buttons">
+      <button onclick="addPost()">Post</button>
+      <button onclick="switchLanguage()">🌐 Change Language</button>
+      <button onclick="speakHelp()">🎤 Voice Help</button>
+    </div>
+
+    <h3>Community Feed</h3>
+    <div id="post-list"></div>
+  </div>
+
+  <footer class="footer">
+    &copy; 2025 AgriMind. All rights reserved.
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBTJlnkTAjsPtknHRiB48IBObhzcizAXpc",
+      authDomain: "agrimind-eec25.firebaseapp.com",
+      projectId: "agrimind-eec25",
+      storageBucket: "agrimind-eec25.appspot.com",
+      messagingSenderId: "987797195231",
+      appId: "1:987797195231:web:e74428a9607a7acb57dc6a",
+      measurementId: "G-N01ZCW91XC"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function loadPosts() {
+      const postList = document.getElementById('post-list');
+      postList.innerHTML = "";
+
+      const snapshot = await db.collection("posts").orderBy("time", "desc").get();
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const postDiv = document.createElement("div");
+        postDiv.className = "post";
+        postDiv.innerHTML = `
+          <p>${data.text}</p>
+          <div class="reply-box">
+            <input type="text" placeholder="Reply..." onkeydown="if(event.key==='Enter') addReply('${doc.id}', this)" />
+          </div>
+          <div class="replies" id="replies-${doc.id}"></div>
+        `;
+        postList.appendChild(postDiv);
+        loadReplies(doc.id);
+      });
+    }
+
+    async function addPost() {
+      const postText = document.getElementById('new-post').value.trim();
+      if (!postText) return;
+      await db.collection("posts").add({
+        text: postText,
+        time: new Date()
+      });
+      document.getElementById('new-post').value = "";
+      loadPosts();
+    }
+
+    async function addReply(postId, input) {
+      const replyText = input.value.trim();
+      if (!replyText) return;
+      await db.collection("posts").doc(postId).collection("replies").add({
+        text: replyText,
+        time: new Date()
+      });
+      input.value = "";
+      loadReplies(postId);
+    }
+
+    async function loadReplies(postId) {
+      const replyBox = document.getElementById(`replies-${postId}`);
+      replyBox.innerHTML = "";
+
+      const snapshot = await db.collection("posts").doc(postId).collection("replies").orderBy("time", "asc").get();
+      snapshot.forEach(doc => {
+        const reply = doc.data();
+        replyBox.innerHTML += `<p>→ ${reply.text}</p>`;
+      });
+    }
+
+    function switchLanguage() {
+      alert('Language switching feature coming soon (Hindi, Punjabi, Tamil)');
+    }
+
+    function speakHelp() {
+      const msg = new SpeechSynthesisUtterance('Welcome to the AgriMind Community! Share your thoughts and connect with fellow farmers.');
+      window.speechSynthesis.speak(msg);
+    }
+
+    loadPosts();
+  </script>
+
+</body>
+</html>
